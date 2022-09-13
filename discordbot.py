@@ -49,17 +49,23 @@ async def on_voice_state_update(member, before, after):
 
 @client.event   # メッセージ投稿検知イベント
 async def on_message(message):
+
+    # ボット自身の発言を検知しないよう判別
     if client.user != message.author:
+
+        # 情報を表示するサーバーを特定
+        channelID = guildID2channelID[message.guild.id]
+        bot_channel = client.get_channel(channelID)
+
         if message.content == "/info":
-
-            # 情報を表示するサーバーを特定
-            channelID = guildID2channelID[message.guild.id]
-            bot_channel = client.get_channel(channelID)
-
             m = "ボット発言チャンネル：" + str(bot_channel) + "\n"
             m += "最終アップデート " + last_update + "\n"
-
             await message.channel.send(m)
+
+        if message.content == '/plot':
+            last_msg = await bot_channel.fetch_message(bot_channel.last_message_id)
+            last_msg_content = last_msg.content
+            await message.channel.send(last_msg_content)
 
 
 client.run(token)

@@ -83,6 +83,7 @@ async def on_message(message):
                         author = msg[22:-24]
                         m += IO_state + " : " + author + " : " + timedata + "/n"
             
+            await message.channel.send("done!")
             await message.channel.send(m)
 
 

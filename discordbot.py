@@ -64,9 +64,9 @@ async def on_message(message):
             await message.channel.send(m)
 
         if message.content == '/plot':
-            log_list = []
+            m = ""
             # チャンネル内のVC入退室ログを取得
-            async for message in bot_channel.history(limit=100):
+            async for message in bot_channel.history(limit=50):
                 # botの発言のみ取得
                 if message.author == client.user:
                     # 入退室通知文のみ取得
@@ -77,8 +77,10 @@ async def on_message(message):
                         else:
                             IO_state = "O"
                         timedata = msg[-17:-3]
-                        author = msg[20:-22]
-                        await message.channel.send(IO_state + " : " + author + " : " +timedata)
+                        author = msg[22:-24]
+                        m += IO_state + " : " + author + " : " +timedata + "/n"
+            
+            await message.channel.send(m)
 
 
 client.run(token)

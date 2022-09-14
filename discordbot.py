@@ -81,10 +81,11 @@ async def on_message(message):
                             IO_state = "O"
                         timedata = msg[-17:-3]
                         author = msg[22:-24]
-                        m += IO_state + " : " + author + " : " + timedata + "/n"
+                        tmp = IO_state + " : " + author + " : " + timedata + "/n"
+                        await message.channel.send(tmp)
+                        m += tmp
             
             await message.channel.send("done!")
             await message.channel.send(m)
-
 
 client.run(token)

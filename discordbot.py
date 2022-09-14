@@ -12,7 +12,7 @@ guildID2channelID = {
 
 token = os.environ['DISCORD_BOT_TOKEN']
 JST = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 
 bot_channel = None

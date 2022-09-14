@@ -64,9 +64,17 @@ async def on_message(message):
             await message.channel.send(m)
 
         if message.content == '/plot':
-            last_msg = await bot_channel.fetch_message(bot_channel.last_message_id)
-            last_msg_content = last_msg.content
-            await message.channel.send(last_msg_content)
+            log_list = []
+            # チャンネル内のVC入退室ログを取得
+            async for message in bot_channel.history(limit=10):
+                # botの発言のみ取得
+                if message.author == client.user:
+                    # 入退室通知文のみ取得
+                    msg = message.content
+                    if msg.startswith(":blue_circle: IN :") or msg.startswith(":red_circle: OUT :"):
+                        timedata = msg[-17:-3]
+                        author = msg[19:-21]
+                        await message.channel.send(author + " : " +timedata)
 
 
 client.run(token)

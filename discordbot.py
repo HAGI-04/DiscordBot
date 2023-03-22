@@ -85,14 +85,17 @@ async def on_voice_state_update(member, before, after):
 async def on_message(message):
     # ボット自身の発言を検知しないよう判別
     if client.user != message.author:
-        if message.content == "/info":
+        if message.content.startswith("/info"):
             channel_id = guild_id_to_channel_id[message.guild.id]
             bot_channel = client.get_channel(channel_id)
             info_message = f"ボット発言チャンネル：{bot_channel}\n最終アップデート {last_update}\n"
             await message.channel.send(info_message)
-        elif message.content == "/gantt":
+        elif message.content.startswith("/gantt"):
+            await message.channel.send("Reading voice history...")
             voice_history = await read_voice_history(message.guild.id)
+            await message.channel.send("Generating gantt chart...")
             gantt_chart = generate_gantt_chart(voice_history)
+            await message.channel.send("Sending gantt chart...")
             await message.channel.send(gantt_chart)
 
 

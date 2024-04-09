@@ -12,10 +12,7 @@ DISCORD_BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Discordクライアントを初期化
-intents = discord.Intents.default()
-intents.guild_messages = True
-intents.voice_states = True
-intents.messages = True  # メッセージイベントを有効にする
+intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 
 # 日本標準時

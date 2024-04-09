@@ -13,7 +13,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Discordクライアントを初期化
 intents = discord.Intents.default()
-intents.messages = True
+intents.guild_messages = True
 intents.voice_states = True
 client = discord.Client(intents=intents)
 

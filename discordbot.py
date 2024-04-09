@@ -70,7 +70,7 @@ async def on_message(message):
 
     elif message.content.startswith("/set"):
         if update_DB(message.guild.id, message.channel.id, message.guild.name):
-            guild_id_2_channel_id = fetch_DB()
+            guild_id_2_channel_id[message.guild.id] = message.channel.id
             await message.channel.send(":white_check_mark: ボット投稿チャンネルをこのチャンネルにセットしました")
         else:
             await message.channel.send(":x: ボット投稿チャンネルの設定に失敗しました")

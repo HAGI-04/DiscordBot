@@ -36,8 +36,8 @@ async def on_ready():
     global restarted_at
     restarted_at = datetime.datetime.now(JST).strftime("[%m/%d %H:%M:%S]")
 
-    global guild_id_2_channel_id
-    guild_id_2_channel_id = fetch_DB()
+    #global guild_id_2_channel_id
+    #guild_id_2_channel_id = fetch_DB()
 
 @client.event   
 async def on_voice_state_update(member, before, after):

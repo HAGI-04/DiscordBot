@@ -66,18 +66,18 @@ async def on_message(message):
     
     bot_channel = client.get_channel(channel_id)
 
-    if message.content == "/info":
+    if message.content.startswith("/info"):
         info_message = f":white_check_mark: ボット発言チャンネル : {bot_channel.name}\n:white_check_mark: 最終アップデート : {restarted_at}\n"
         await message.channel.send(info_message)
 
-    elif message.content == "/set":
+    elif message.content.startswith("/set"):
         if update_DB(message.guild.id, message.channel.id, message.guild.name):
             guild_id_2_channel_id = fetch_DB()
             await message.channel.send(":white_check_mark: ボット投稿チャンネルをこのチャンネルにセットしました")
         else:
             await message.channel.send(":x: ボット投稿チャンネルの設定に失敗しました")
     
-    elif message.content == "/list":
+    elif message.content.startswith("/show"):
         list_message = ":white_check_mark: 登録済みサーバー : ボット発言チャンネル\n```\n"
         for guild_id, channel_id in guild_id_2_channel_id.items():
             list_message += f"{client.get_guild(guild_id).name} : {client.get_channel(channel_id).name}\n"

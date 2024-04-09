@@ -23,7 +23,7 @@ guild_id_2_channel_id = {}
 restarted_at = ""
 
 def fetch_DB():
-    response = supabase.table('GuildID2ChannelID').execute()
+    response = supabase.table('GuildID2ChannelID').select("*").execute()
     return {d['guild_id']: d['channel_id'] for d in response.data} if response.data else {}
 
 def update_DB(guild_id, channel_id, guild_name):
@@ -36,8 +36,8 @@ async def on_ready():
     global restarted_at
     restarted_at = datetime.datetime.now(JST).strftime("[%m/%d %H:%M:%S]")
 
-    #global guild_id_2_channel_id
-    #guild_id_2_channel_id = fetch_DB()
+    global guild_id_2_channel_id
+    guild_id_2_channel_id = fetch_DB()
 
 @client.event   
 async def on_voice_state_update(member, before, after):

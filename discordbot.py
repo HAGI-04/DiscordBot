@@ -59,6 +59,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    global guild_id_2_channel_id
     channel_id = guild_id_2_channel_id.get(message.guild.id)
     if channel_id is None:
         return

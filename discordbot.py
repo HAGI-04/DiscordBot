@@ -20,14 +20,6 @@ JST = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
 guild_id_2_channel_id = {}
 restarted_at = ""
 
-def fetch_DB():
-    response = supabase.table('GuildID2ChannelID').select("*").execute()
-    return {d['guild_id']: d['channel_id'] for d in response.data} if response.data else {}
-
-def update_DB(guild_id, channel_id, guild_name):
-    response = supabase.table('GuildID2ChannelID').upsert({'guild_id': guild_id, 'channel_id': channel_id, 'guild_name': guild_name}).execute()
-    return response.status_code == 201
-
 @client.event
 async def on_ready():
     """ボットが起動したときの処理"""
@@ -35,7 +27,7 @@ async def on_ready():
     restarted_at = datetime.datetime.now(JST).strftime("[%m/%d %H:%M:%S]")
 
     global guild_id_2_channel_id
-    guild_id_2_channel_id = fetch_DB()
+    guild_id_2_channel_id = await supabase.table('GuildID2ChannelID').select("*").execute()
 
 @client.event   
 async def on_voice_state_update(member, before, after):
@@ -69,11 +61,13 @@ async def on_message(message):
         await message.channel.send(info_message)
 
     elif message.content.startswith("/set"):
-        if update_DB(message.guild.id, message.channel.id, message.guild.name):
+        try:
+            await message.channel.send(":thinking: ボット投稿チャンネルの変更を試みています...")
+            await supabase.table('GuildID2ChannelID').upsert({'guild_id': message.guild.id, 'channel_id': message.channel.id, 'guild_name': message.guild.name}).execute()
             guild_id_2_channel_id[message.guild.id] = message.channel.id
-            await message.channel.send(":white_check_mark: ボット投稿チャンネルをこのチャンネルにセットしました")
-        else:
-            await message.channel.send(":x: ボット投稿チャンネルの設定に失敗しました")
+            await message.channel.send(":saluting_face: ボット投稿チャンネルをこのチャンネルにセットしました")
+        except Exception as e:
+            await message.channel.send(":tired_face: ボット投稿チャンネルの設定に失敗しました")
     
     elif message.content.startswith("/show"):
         list_message = ":white_check_mark: サーバー名 : チャンネル名\n```\n"

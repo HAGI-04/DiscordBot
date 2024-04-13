@@ -76,7 +76,7 @@ async def on_message(message):
             await message.channel.send(":x: ボット投稿チャンネルの設定に失敗しました")
     
     elif message.content.startswith("/show"):
-        list_message = ":white_check_mark: 登録済みサーバー : ボット発言チャンネル\n```\n"
+        list_message = ":white_check_mark: サーバー名 : チャンネル名\n```\n"
         for guild_id, channel_id in guild_id_2_channel_id.items():
             list_message += f"{client.get_guild(guild_id).name} : {client.get_channel(channel_id).name}\n"
         list_message += "```"

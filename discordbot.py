@@ -64,7 +64,7 @@ async def on_message(message):
     elif message.content.startswith("/set"):
         try:
             await message.channel.send(":thinking: ボット投稿チャンネルの変更を試みています...")
-            await supabase.table('GuildID2ChannelID').upsert({'guild_id': message.guild.id, 'channel_id': message.channel.id, 'guild_name': message.guild.name}).execute()
+            supabase.table('GuildID2ChannelID').upsert({'guild_id': message.guild.id, 'channel_id': message.channel.id, 'guild_name': message.guild.name}).execute()
             guild_id_2_channel_id[message.guild.id] = message.channel.id
             await message.channel.send(":saluting_face: ボット投稿チャンネルをこのチャンネルにセットしました")
         except Exception as e:

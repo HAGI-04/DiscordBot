@@ -27,7 +27,7 @@ async def on_ready():
     restarted_at = datetime.datetime.now(JST).strftime("[%m/%d %H:%M:%S]")
 
     global guild_id_2_channel_id
-    guild_id_2_channel_id = await supabase.table('GuildID2ChannelID').select("*").execute()
+    guild_id_2_channel_id = supabase.table('GuildID2ChannelID').select("*").execute()
 
 @client.event   
 async def on_voice_state_update(member, before, after):

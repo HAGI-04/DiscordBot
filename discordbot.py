@@ -57,11 +57,11 @@ async def on_message(message):
     
     bot_channel = client.get_channel(channel_id)
 
-    if message.content.startswith("/info"):
+    if message.content.startswith("/vcbotinfo"):
         info_message = f":white_check_mark: ボット発言チャンネル : {bot_channel.name}\n:white_check_mark: 最終アップデート : {restarted_at}\n"
         await message.channel.send(info_message)
 
-    elif message.content.startswith("/set"):
+    elif message.content.startswith("/vcbotset"):
         try:
             await message.channel.send(":thinking: ボット投稿チャンネルの変更を試みています...")
             supabase.table('GuildID2ChannelID').upsert({'guild_id': message.guild.id, 'channel_id': message.channel.id, 'guild_name': message.guild.name}).execute()
@@ -70,7 +70,7 @@ async def on_message(message):
         except Exception as e:
             await message.channel.send(":tired_face: ボット投稿チャンネルの設定に失敗しました")
     
-    elif message.content.startswith("/show"):
+    elif message.content.startswith("/vcbotshow"):
         list_message = ":white_check_mark: サーバー名 : チャンネル名\n```\n"
         for guild_id, channel_id in guild_id_2_channel_id.items():
             list_message += f"{client.get_guild(guild_id).name} : {client.get_channel(channel_id).name}\n"

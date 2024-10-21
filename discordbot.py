@@ -1,20 +1,19 @@
 import os
 import datetime
-import openai
 import base64
-from PIL import Image
 import io
+from PIL import Image
 import discord
+from openai import OpenAI
 from supabase import create_client
 
 # 環境変数から設定を読み込む
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 DISCORD_BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # OpenAIクライアントを初期化
-openai.api_key = OPENAI_API_KEY
+openai_client = OpenAI()
 
 # Supabaseクライアントを初期化
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -110,13 +109,13 @@ async def on_message(message):
                 processed_image = buffer.getvalue()
             
             # ChatGPTに画像を送信し、回答を取得
-            response = await openai.ChatCompletion.create(
-                model="gpt-4-vision-preview",
+            response = await openai_client.chat.completions.create(
+                model="gpt-4o",
                 messages=[
                     {
                         "role": "user",
                         "content": [
-                            {"type": "text", "text": "この画像に表示された文字を文字起こししてください"},
+                            {"type": "text", "text": "この画像に表示された文字を文字起こししてください。それ以外は一切出力しないでください"},
                             {
                                 "type": "image_url",
                                 "image_url": {
@@ -129,7 +128,7 @@ async def on_message(message):
                 max_tokens=300,
             )
             
-            await message.channel.send(f"ChatGPTの回答: {response.choices[0].message.content}")
+            await message.channel.send(f"{response.choices[0].message.content}")
         
         except Exception as e:
             await message.channel.send(f"エラー: 画像の処理中に問題が発生しました。{str(e)}")

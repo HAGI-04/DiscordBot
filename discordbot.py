@@ -109,7 +109,7 @@ async def on_message(message):
                 processed_image = buffer.getvalue()
             
             # ChatGPTに画像を送信し、回答を取得
-            response = await openai_client.chat.completions.create(
+            response = openai_client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
                     {

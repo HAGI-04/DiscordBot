@@ -99,7 +99,11 @@ async def on_message(message):
             return
 
         try:
-            image = await message.attachments[0].read()
+            tmp = message.attachments[0]
+            width, height = tmp.width, tmp.height
+            name = tmp.filename
+            await message.channel.send(f"画像サイズ: {width}x{height}\nファイル名: {name}")
+            image = await tmp.read()
             
             # 画像を切り抜いてバイト列に変換
             with Image.open(io.BytesIO(image)) as img:

@@ -6,6 +6,8 @@ from PIL import Image
 import discord
 from openai import OpenAI
 from supabase import create_client
+import numpy as np
+import cv2
 
 # 環境変数から設定を読み込む
 SUPABASE_URL = os.getenv('SUPABASE_URL')
@@ -102,13 +104,17 @@ async def on_message(message):
             attachment = message.attachments[0]
             await message.channel.send(f"画像サイズ: {attachment.width}x{attachment.height}\nファイル名: {attachment.filename}")
             
-            # 画像を切り抜いてバイト列に変換
-            image = await attachment.read()
-            with Image.open(io.BytesIO(image)) as img:
-                cropped_img = img.crop((44, 418, 44+448, 418+236))
-                buffer = io.BytesIO()
-                cropped_img.save(buffer, format="PNG")
-                processed_image = buffer.getvalue()
+            # 画像処理と切り抜き
+            image_bytes = await attachment.read()
+            image = Image.open(io.BytesIO(image_bytes))
+            gray_image = image.convert('L')
+            binary_image = gray_image.point(lambda x: 0 if x < 128 else 255, '1')
+            cropped_img = binary_image.crop((44, 418, 44+448, 418+236))
+            
+            # 処理済み画像をバイト列に変換
+            buffer = io.BytesIO()
+            cropped_img.save(buffer, format="PNG")
+            processed_image = buffer.getvalue()
             
             # 切り抜いた画像を送信
             await message.channel.send("加工後画像:", file=discord.File(io.BytesIO(processed_image), filename="cropped_image.png"))
@@ -129,13 +135,14 @@ async def on_message(message):
 
 # ChatGPTに画像の文字起こしを依頼
 def ask_gpt(image):
+    prompt = "この画像に表示された文字を文字起こししてください。難しくても何度かトライしてください。あなたならできます。どうしてもうまくいかない場合は「NG」とだけ出力してください。認識結果の出力あるいは「NG」の出力以外の出力は絶対に行わないでください"
     response = openai_client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": "この画像に表示された文字を文字起こししてください。失敗した場合は「NG」とだけ出力してください。それ以外は一切出力しないでください"},
+                    {"type": "text", "text": prompt},
                     {
                         "type": "image_url",
                         "image_url": {

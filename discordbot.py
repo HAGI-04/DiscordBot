@@ -100,7 +100,6 @@ async def on_message(message):
 
         try:
             attachment = message.attachments[0]
-            await message.channel.send(f"画像サイズ: {attachment.width}x{attachment.height}\nファイル名: {attachment.filename}")
             
             # 画像処理と切り抜き
             image_bytes = await attachment.read()
@@ -115,13 +114,13 @@ async def on_message(message):
             processed_image = buffer.getvalue()
             
             # 切り抜いた画像を送信
-            await message.channel.send("加工後画像:", file=discord.File(io.BytesIO(processed_image), filename="cropped_image.png"))
+            await message.channel.send(file=discord.File(io.BytesIO(processed_image), filename="cropped_image.png"))
             
             # ChatGPTに画像を送信し、回答を取得
             for _ in range(3):
                 response = ask_gpt(processed_image)
                 if response != "NG":
-                    await message.channel.send(response)
+                    await message.channel.send(f"```{response}```")
                     break
                 else:
                     await message.channel.send("retrying...")

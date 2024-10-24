@@ -6,8 +6,6 @@ from PIL import Image
 import discord
 from openai import OpenAI
 from supabase import create_client
-import numpy as np
-import cv2
 
 # 環境変数から設定を読み込む
 SUPABASE_URL = os.getenv('SUPABASE_URL')

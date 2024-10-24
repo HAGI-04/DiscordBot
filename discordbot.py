@@ -119,7 +119,7 @@ async def on_message(message):
             # ChatGPTに画像を送信し、回答を取得
             for _ in range(3):
                 response = ask_gpt(processed_image)
-                if response != "NG":
+                if not response.startswith("```"):
                     await message.channel.send(f"```{response}```")
                     break
                 else:
@@ -132,7 +132,7 @@ async def on_message(message):
 
 # ChatGPTに画像の文字起こしを依頼
 def ask_gpt(image):
-    prompt = "この画像に表示された文字を文字起こししてください。難しくても何度かトライしてください。あなたならできます。どうしてもうまくいかない場合は「NG」とだけ出力してください。認識結果の出力あるいは「NG」の出力以外の出力は絶対に行わないでください"
+    prompt = "この画像に表示された文字を文字起こししてください。難しくても何度かトライしてください。あなたならできます。頑張ってください、応援しています。"
     response = openai_client.chat.completions.create(
         model="gpt-4o",
         messages=[

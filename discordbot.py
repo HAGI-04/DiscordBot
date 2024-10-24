@@ -93,49 +93,61 @@ async def on_message(message):
         await message.channel.send(list_message)
     
     # OW スクリーンショットのチャット欄文章翻訳機能
-    elif message.content.startswith("/ow"):
+    elif message.content.startswith("/owocr"):
         if len(message.attachments) != 1:
             await message.channel.send("エラー: 画像を1枚だけ添付してください")
             return
 
         try:
-            tmp = message.attachments[0]
-            width, height = tmp.width, tmp.height
-            name = tmp.filename
-            await message.channel.send(f"画像サイズ: {width}x{height}\nファイル名: {name}")
-            image = await tmp.read()
+            attachment = message.attachments[0]
+            await message.channel.send(f"画像サイズ: {attachment.width}x{attachment.height}\nファイル名: {attachment.filename}")
             
             # 画像を切り抜いてバイト列に変換
+            image = await attachment.read()
             with Image.open(io.BytesIO(image)) as img:
                 cropped_img = img.crop((44, 418, 44+448, 418+236))
                 buffer = io.BytesIO()
                 cropped_img.save(buffer, format="PNG")
                 processed_image = buffer.getvalue()
             
-            # ChatGPTに画像を送信し、回答を取得
-            response = openai_client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": "この画像に表示された文字を文字起こししてください。それ以外は一切出力しないでください"},
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": f"data:image/png;base64,{base64.b64encode(processed_image).decode('utf-8')}",
-                                }
-                            }
-                        ],
-                    }
-                ],
-                max_tokens=300,
-            )
+            # 切り抜いた画像を送信
+            await message.channel.send("加工後画像:", file=discord.File(io.BytesIO(processed_image), filename="cropped_image.png"))
             
-            await message.channel.send(f"{response.choices[0].message.content}")
+            # ChatGPTに画像を送信し、回答を取得
+            for _ in range(3):
+                response = ask_gpt(processed_image)
+                if response != "NG":
+                    await message.channel.send(response)
+                    break
+                else:
+                    await message.channel.send("retrying...")
+            else:
+                await message.channel.send("エラー: 文字起こしに失敗しました")
         
         except Exception as e:
             await message.channel.send(f"エラー: 画像の処理中に問題が発生しました。{str(e)}")
+
+# ChatGPTに画像の文字起こしを依頼
+def ask_gpt(image):
+    response = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "この画像に表示された文字を文字起こししてください。失敗した場合は「NG」とだけ出力してください。それ以外は一切出力しないでください"},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{base64.b64encode(image).decode('utf-8')}",
+                        }
+                    }
+                ],
+            }
+        ],
+        max_tokens=300,
+    )
+    return response.choices[0].message.content
 
 client.run(DISCORD_BOT_TOKEN)
 

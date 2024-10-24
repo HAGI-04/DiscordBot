@@ -132,7 +132,7 @@ async def on_message(message):
 
 # ChatGPTに画像の文字起こしを依頼
 def ask_gpt(image):
-    prompt = "この画像に表示された文字を文字起こししてください。難しくても何度かトライしてください。あなたならできます。頑張ってください、応援しています。"
+    prompt = "この画像に表示された文字を文字起こししてください。回答以外の余計なものは一切出力しないでください。難しくても何度かトライしてください。あなたならできます。頑張ってください、応援しています。"
     response = openai_client.chat.completions.create(
         model="gpt-4o",
         messages=[
